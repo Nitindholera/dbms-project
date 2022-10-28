@@ -1,3 +1,4 @@
+show databases;
 create table user(
 	User_id int not null primary key,
     Fname varchar(28),
@@ -14,11 +15,15 @@ create table user(
 );
 
 create table user_phone_number(
-	phone_number varchar(10) primary key,
+	phone_number varchar(10) primary key,	
     User_id int,
 	FOREIGN KEY (User_id) REFERENCES user(User_id) 
     ON DELETE CASCADE   
     ON UPDATE CASCADE
+);
+
+create table chat(
+	Chat_id int not null primary key
 );
 
 create table group_data(
@@ -49,10 +54,6 @@ create table message(
     foreign key(Chat_id) references chat(Chat_id)
 );
 
-create table chat(
-	Chat_id int not null primary key
-);
-
 create table friend(
 	Friend_id int not null primary key,
     Chat_id int,
@@ -67,6 +68,9 @@ create table is_member_friend(
 	primary key(Friend_id, User_id)
 );
 
-insert into user values(1,"Mohammad", "anas", "khan", "loves kali", "khan@gmail.com", "123", "v.com", "2008-7-04", "m", true, 2345);
+insert into user values(1,"Mohammad", "anas", "khan", "loves kal", "khan@gmail.com", "123", "v.com", "2008-7-04", "m", true, 2345);
+insert into user_phone_number values("8797136137",1);
+describe user_phone_number;
+select * from user_phone_number;
 select * from user;
 
