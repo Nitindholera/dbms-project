@@ -82,5 +82,13 @@ create table friend_requests(
 	Foreign key(reciever) references user(User_name),
 	primary key(sender,reciever)
 );
+
+create table group_invites(
+	User_name varchar(28),
+	Invites int,
+	Foreign key(User_name) references user(User_name),
+	Foreign key(Invites) references group_data(Group_id),
+	primary key(User_name,Invites)
+);
 -- insert into user values("anus", "Mohammad", "anas", "khan", "loves kali", "khan@gmail.com", "123", "v.com", "2008-7-04", "m", true, 2345);
 select * from user;
