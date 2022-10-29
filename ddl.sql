@@ -76,11 +76,11 @@ create table is_member_friend(
 );
 
 create table friend_requests(
-	user varchar(28),
-	User_name varchar(28),
-	Foreign key(User) references user(User_name),
-	Foreign key(User_name) references user(User_name),
-	primary key(User,User_name)
+	sender varchar(28),
+	reciever varchar(28),
+	Foreign key(sender) references user(User_name),
+	Foreign key(reciever) references user(User_name),
+	primary key(sender,reciever)
 );
 -- insert into user values("anus", "Mohammad", "anas", "khan", "loves kali", "khan@gmail.com", "123", "v.com", "2008-7-04", "m", true, 2345);
 select * from user;
