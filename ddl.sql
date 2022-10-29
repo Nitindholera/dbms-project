@@ -1,8 +1,12 @@
-show databases;
+drop database mediabase;
+
+create database mediabase;
+
+use mediabase;
+
 create table user(
-	User_id int not null primary key,
+	User_name varchar(28) not null primary key,
     Fname varchar(28),
-    Mname varchar(28),
     Lname varchar(28),
     Description varchar(128),
     Email_id varchar(128),
@@ -11,13 +15,14 @@ create table user(
     Date_of_birth date,
     Gender char,
     is_verified bool,
-    verify_pin int
+    verify_pin int,
+    token varchar(8)
 );
 
 create table user_phone_number(
-	phone_number varchar(10) primary key,	
-    User_id int,
-	FOREIGN KEY (User_id) REFERENCES user(User_id) 
+	phone_number varchar(10) primary key,
+    User_name varchar(28),
+	FOREIGN KEY (User_name) REFERENCES user(User_name) 
     ON DELETE CASCADE   
     ON UPDATE CASCADE
 );
@@ -38,21 +43,23 @@ create table group_data(
 create table is_member_group(
 	Group_id int,
     Foreign key(Group_id) references group_data(Group_id),
-    User_id int,
-	Foreign key(User_id) references user(User_id),
+    User_name varchar(28),
+	Foreign key(User_name) references user(User_name),
     is_admin bool,
-	primary key(Group_id, User_id)
+	primary key(Group_id, User_name)
 );
 
 create table message(
 	message_id int not null primary key,
-    send_by int,
-    foreign key (send_by) references user(User_id),
+    send_by varchar(28),
+    foreign key (send_by) references user(User_name),
     time TIME,
     data varchar(256),
     Chat_id int,
     foreign key(Chat_id) references chat(Chat_id)
 );
+
+
 
 create table friend(
 	Friend_id int not null primary key,
@@ -63,14 +70,10 @@ create table friend(
 create table is_member_friend(
 	Friend_id int,
     Foreign key(Friend_id) references friend(Friend_id),
-    User_id int,
-	Foreign key(User_id) references user(User_id),
-	primary key(Friend_id, User_id)
+    User_name varchar(28),
+	Foreign key(User_name) references user(User_name),
+	primary key(Friend_id, User_name)
 );
 
-insert into user values(1,"Mohammad", "anas", "khan", "loves kal", "khan@gmail.com", "123", "v.com", "2008-7-04", "m", true, 2345);
-insert into user_phone_number values("8797136137",1);
-describe user_phone_number;
-select * from user_phone_number;
+-- insert into user values("anus", "Mohammad", "anas", "khan", "loves kali", "khan@gmail.com", "123", "v.com", "2008-7-04", "m", true, 2345);
 select * from user;
-

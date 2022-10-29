@@ -1,67 +1,63 @@
 package com.mediabase.messanger.tables;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 public class user {
-    private Integer User_id;
+    private String User_name;
     private String Fname;
-    private String Mname;
     private String Lname;
     private String Description;
     private String Email_id;
     private String Password;
     private String Profile_pic;
-    private Date Date_of_birth;
+    private LocalDate Date_of_birth;
     private Character Gender;
     private Boolean is_verified;
     private Integer verify_pin;
 
-    public user(Integer user_id, String fname, String mname, String lname, String description, String email_id,
-            String password, String profile_pic, Date date_of_birth, Character gender, Boolean is_verified,
-            Integer verify_pin) {
-        User_id = user_id;
-        Fname = fname;
-        Mname = mname;
-        Lname = lname;
+    private String token;
+
+    public user(String user_name, String first_name, String last_name, String description, String email,
+                String password, String profile_pic, LocalDate dob, Character gender, Boolean is_verified,
+                Integer verify_pin, String token) {
+        User_name = user_name;
+        Fname = first_name;
+        Lname = last_name;
         Description = description;
-        Email_id = email_id;
+        Email_id = email;
         Password = password;
         Profile_pic = profile_pic;
-        Date_of_birth = date_of_birth;
+        Date_of_birth = dob;
         Gender = gender;
         this.is_verified = is_verified;
         this.verify_pin = verify_pin;
+        this.token = token;
     }
 
-    public Date getDate_of_birth() {
+    public LocalDate getDate_of_birth() {
         return Date_of_birth;
     }
 
-    public void setDate_of_birth(Date date_of_birth) {
+    public void setDate_of_birth(LocalDate date_of_birth) {
         Date_of_birth = date_of_birth;
     }
 
     public user(){}
 
 
-    
-    public Integer getUser_id() {
-        return User_id;
+
+    public String getUser_name() {
+        return User_name;
     }
-    public void setUser_id(Integer user_id) {
-        User_id = user_id;
+    public void setUser_name(String user_name) {
+        User_name = user_name;
     }
     public String getFname() {
         return Fname;
     }
     public void setFname(String fname) {
         Fname = fname;
-    }
-    public String getMname() {
-        return Mname;
-    }
-    public void setMname(String mname) {
-        Mname = mname;
     }
     public String getLname() {
         return Lname;
@@ -112,5 +108,11 @@ public class user {
         this.verify_pin = verify_pin;
     }
 
-    
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
 }
