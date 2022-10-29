@@ -1,6 +1,10 @@
 package com.mediabase.messanger.tables_dao;
 
+import java.nio.charset.Charset;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
+import java.util.Random;
 
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -17,7 +21,54 @@ public class userDAO {
     }
 
     public List<user> fetchall(){
-        String sql = "SELECT * FROM user";
+        String sql = "SELECT * FROM user;";
         return jdbcTemplate.query(sql,new BeanPropertyRowMapper<user>(user.class));
     }
+
+    public user fetchuser(String user_name){
+        String sql = "SELECT * FROM user " + "where User_name = \"" + user_name + "\";";
+        List<user> a = jdbcTemplate.query(sql, new BeanPropertyRowMapper<user>(user.class));
+        if(a.size() == 0) return null;
+        return a.get(0);
+    }
+
+    public HashMap Register(user user){
+        HashMap<String, String> map = new HashMap<>();
+        if(user.getUser_name() == null) map.put("username", "Username can not be empty.");
+        else if (fetchuser(user.getUser_name()) != null) map.put("username", "Username already in use.");
+        if(user.getEmail_id() == null) map.put("email_id", "Email inappropriate or already in use.");
+        if(user.getDate_of_birth() == null) map.put("date_of_birth", "Enter correct DOB.");
+        if (user.getPassword() == null) map.put("password", "Inappropriate password.");
+        if (user.getFname() == null) map.put("fname", "First name can not be empty.");
+        if (user.getLname() == null) map.put("lname", "Last name can not be empty.");
+        if(map.size()==0) {
+        String sql = "insert into user(User_name, Fname, Lname, Email_id, Date_of_birth, password) values(\"" +
+                user.getUser_name() + "\",\"" + user.getFname()+  "\",\"" + user.getLname() + "\",\"" +  user.getEmail_id() + "\",\"" + user.getDate_of_birth() +
+                "\",\"" + user.getPassword() + "\");";
+        jdbcTemplate.execute(sql);}
+        return map;
+    }
+
+    public String Get_Set_token(String user_name){
+        byte[] array = new byte[8];
+        new Random().nextBytes(array);
+        String generatedString = new String(array, Charset.forName("UTF-8"));
+        String sql = "update user set token = \"" + generatedString + "\" where User_name = \"" + user_name + "\";";
+        jdbcTemplate.execute(sql);
+        return generatedString;
+    }
+
+    public HashMap Login(user user){
+        HashMap<String, String> map = new HashMap<>();
+        if(user.getUser_name() == null || user.getUser_name().length()==0) map.put("username", "Username can not be empty.");
+        if (user.getPassword() == null || user.getPassword().length()==0) map.put("password", "Inappropriate password.");
+        user q = fetchuser(user.getUser_name());
+        if(q == null) map.put("username", "Username incorrect.");
+        else if(!Objects.equals(q.getPassword(), user.getPassword())) map.put("password", "Incorrect password.");
+        if(map.size()==0) {
+            map.put("token", Get_Set_token(user.getUser_name()));
+            }
+        return map;
+    }
+
 }
