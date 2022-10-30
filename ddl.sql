@@ -77,7 +77,7 @@ create table is_member_friend(
 
 create table friend_requests(
 	sender varchar(28),
-	reciever varchar(28),
+	receiver varchar(28),
 	Foreign key(sender) references user(User_name),
 	Foreign key(reciever) references user(User_name),
 	primary key(sender,reciever)
@@ -92,3 +92,6 @@ create table group_invites(
 );
 -- insert into user values("anus", "Mohammad", "anas", "khan", "loves kali", "khan@gmail.com", "123", "v.com", "2008-7-04", "m", true, 2345);
 select * from user;
+
+-- insert into friend_requests values("deva", "deva1"); 
+
