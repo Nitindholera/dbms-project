@@ -32,6 +32,13 @@ public class userDAO {
         return a.get(0);
     }
 
+    public user fetchuser_token(String token){
+        String sql = "SELECT * FROM user " + "where token = \"" + token + "\";";
+        List<user> a = jdbcTemplate.query(sql, new BeanPropertyRowMapper<user>(user.class));
+        if(a.size() == 0) return null;
+        return a.get(0);
+    }
+
     public HashMap Register(user user){
         HashMap<String, String> map = new HashMap<>();
         if(user.getUser_name() == null) map.put("username", "Username can not be empty.");
@@ -50,9 +57,12 @@ public class userDAO {
     }
 
     public String Get_Set_token(String user_name){
-        byte[] array = new byte[8];
-        new Random().nextBytes(array);
-        String generatedString = new String(array, Charset.forName("UTF-8"));
+        Random random = new Random();
+
+        String generatedString = random.ints(65, 98)
+                .limit(8)
+                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                .toString();
         String sql = "update user set token = \"" + generatedString + "\" where User_name = \"" + user_name + "\";";
         jdbcTemplate.execute(sql);
         return generatedString;
