@@ -64,4 +64,12 @@ public class ApiController {
         if(map.size() == 0) return new ResponseEntity<>(HttpStatus.OK);
         return new ResponseEntity<>( map, HttpStatus.BAD_REQUEST);
     }
+
+    @PostMapping("/grp_exit")
+    ResponseEntity<HashMap> grp_exit(@RequestHeader("token") String token, @RequestBody group_data group){
+        user sender = userDAO.fetchuser_token(token);
+        HashMap map = group_dataDAO.grp_exit(sender, group);
+        if(map.size() == 0) return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>( map, HttpStatus.BAD_REQUEST);
+    }
 }
