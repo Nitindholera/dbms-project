@@ -41,13 +41,13 @@ public class userDAO {
 
     public HashMap Register(user user){
         HashMap<String, String> map = new HashMap<>();
-        if(user.getUser_name() == null) map.put("username", "Username can not be empty.");
-        else if (fetchuser(user.getUser_name()) != null) map.put("username", "Username already in use.");
-        if(user.getEmail_id() == null) map.put("email_id", "Email inappropriate or already in use.");
+        if(user.getUser_name() == null || user.getUser_name().length()==0) map.put("user_name", "Username can not be empty.");
+        else if (fetchuser(user.getUser_name()) != null) map.put("user_name", "Username already in use.");
+        if(user.getEmail_id() == null || user.getEmail_id().length()==0) map.put("email_id", "Email inappropriate or already in use.");
         if(user.getDate_of_birth() == null) map.put("date_of_birth", "Enter correct DOB.");
-        if (user.getPassword() == null) map.put("password", "Inappropriate password.");
-        if (user.getFname() == null) map.put("fname", "First name can not be empty.");
-        if (user.getLname() == null) map.put("lname", "Last name can not be empty.");
+        if (user.getPassword() == null || user.getPassword().length()==0) map.put("password", "Inappropriate password.");
+        if (user.getFname() == null || user.getFname().length() ==0) map.put("fname", "First name can not be empty.");
+        if (user.getLname() == null || user.getLname().length()==0) map.put("lname", "Last name can not be empty.");
         if(map.size()==0) {
         String sql = "insert into user(User_name, Fname, Lname, Email_id, Date_of_birth, password) values(\"" +
                 user.getUser_name() + "\",\"" + user.getFname()+  "\",\"" + user.getLname() + "\",\"" +  user.getEmail_id() + "\",\"" + user.getDate_of_birth() +
@@ -59,7 +59,7 @@ public class userDAO {
     public String Get_Set_token(String user_name){
         Random random = new Random();
 
-        String generatedString = random.ints(65, 98)
+        String generatedString = random.ints(35, 91)
                 .limit(8)
                 .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
                 .toString();
@@ -70,7 +70,7 @@ public class userDAO {
 
     public HashMap Login(user user){
         HashMap<String, String> map = new HashMap<>();
-        if(user.getUser_name() == null || user.getUser_name().length()==0) map.put("username", "Username can not be empty.");
+        if(user.getUser_name() == null || user.getUser_name().length()==0) map.put("user_name", "Username can not be empty.");
         if (user.getPassword() == null || user.getPassword().length()==0) map.put("password", "Inappropriate password.");
         user q = fetchuser(user.getUser_name());
         if(q == null) map.put("username", "Username incorrect.");
