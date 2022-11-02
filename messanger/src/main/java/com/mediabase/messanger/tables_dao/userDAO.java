@@ -10,6 +10,7 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import com.mediabase.messanger.forms.profile_image_update_form;
 import com.mediabase.messanger.tables.user;
 
 @Repository
@@ -90,6 +91,17 @@ public class userDAO {
         String sql = "update user set Fname = \"" + user.getFname() + "\", Lname = \"" + user.getLname() + "\", Description = \"" + user.getDescription() + "\", Date_of_birth = \""+
         user.getDate_of_birth() + "\", Gender = \"" + user.getGender() + "\" where User_name = \""
         + sender.getUser_name() + "\"";
+        jdbcTemplate.execute(sql);
+        return map;
+    }
+
+    public HashMap profileImageUpdate(user sender, profile_image_update_form profile_image_update){
+        HashMap<String, String> map = new HashMap<>();
+        if(sender == null) map.put("sender", "Unauthorized access.");
+        if(profile_image_update.img_url == null) map.put("img_url", "insufficient data");
+        if(map.size()>0) return map;
+
+        String sql = "update user set Profile_pic = \"" + profile_image_update.img_url + "\" where User_name = \"" + sender.getUser_name() + "\"";
         jdbcTemplate.execute(sql);
         return map;
     }
