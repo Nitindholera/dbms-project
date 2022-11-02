@@ -77,12 +77,12 @@ public class group_dataDAO {
         if(sender == null) map.put("sender", "Unauthorized access.");
         if(group == null) map.put("group", "Group not found.");
         if(map.size()>0) return map;
-        String sql = "select * from group_invites where Group_id = " + group.getGroup_id() + " and User_name = \"" + sender.getUser_name() + " \"";
+        String sql = "select * from group_invites where Group_id = " + group.getGroup_id() + " and User_name = \"" + sender.getUser_name() + "\"";
 
         List<group_invites> x = jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(group_invites.class));
         if(x.size() == 0) map.put("sender", "Request not found.");
         if(map.size()==0){
-            sql = "DELETE FROM group_invites where Group_id = " + group.getGroup_id() + " and User_name = \"" + sender.getUser_name() + " \"";
+            sql = "DELETE FROM group_invites where Group_id = " + group.getGroup_id() + " and User_name = \"" + sender.getUser_name() + "\"";
             jdbcTemplate.execute(sql);
             if(bool) {
                 sql = "insert into is_member_group(Group_id, User_name, is_admin) values(" + group.getGroup_id() + ", \"" + sender.getUser_name() + "\", 0);";
@@ -125,6 +125,91 @@ public class group_dataDAO {
             sql = "delete from is_member_group where Group_id = " + group.getGroup_id() + " and User_name = \"" + sender.getUser_name() + "\"";
             jdbcTemplate.execute(sql);
         }
+        return map;
+    }
+
+    public HashMap group_member_remove(user sender, group_data grp, user receiver){
+        HashMap<String, String> map = new HashMap<>();
+        if(sender == null) map.put("sender", "Unauthorized access.");
+        if(grp == null) map.put("group", "Group not found.");
+        if(receiver == null) map.put("receiver", "User not found");
+        if(map.size()>0) return map;
+
+        String sql = "select * from is_member_group where Group_id = " + grp.getGroup_id() + " and User_name = \"" + sender.getUser_name() + "\" and is_admin = 1";        
+        List<is_member_group> x = jdbcTemplate.query(sql, new BeanPropertyRowMapper<is_member_group>(is_member_group.class));
+        if(x.size() == 0) map.put("group", "sender is not an admin or sender is not in that grp");
+        if(map.size()>0) return map;
+        
+        sql = "select * from is_member_group where Group_id = " + grp.getGroup_id() + " and User_name = \"" + receiver.getUser_name() + "\"";        
+        x = jdbcTemplate.query(sql, new BeanPropertyRowMapper<is_member_group>(is_member_group.class));
+        
+        if(x.size() == 0) map.put("group", "receiver is not a member of this group");
+        if(map.size()>0) return map;
+
+        sql = "delete from is_member_group where Group_id = " + grp.getGroup_id() + " and User_name = \"" + receiver.getUser_name() + "\"";
+            jdbcTemplate.execute(sql);
+        return map;
+    }
+
+    public HashMap grp_admin_create(user sender, group_data grp, user receiver){
+        HashMap<String, String> map = new HashMap<>();
+        if(sender == null) map.put("sender", "Unauthorized access.");
+        if(grp == null) map.put("group", "Group not found.");
+        if(receiver == null) map.put("receiver", "User not found");
+        if(map.size()>0) return map;
+
+        String sql = "select * from is_member_group where Group_id = " + grp.getGroup_id() + " and User_name = \"" + sender.getUser_name() + "\" and is_admin = 1";        
+        List<is_member_group> x = jdbcTemplate.query(sql, new BeanPropertyRowMapper<is_member_group>(is_member_group.class));
+        if(x.size() == 0) map.put("group", "sender is not an admin or sender is not in that grp");
+        if(map.size()>0) return map;
+        
+        sql = "select * from is_member_group where Group_id = " + grp.getGroup_id() + " and User_name = \"" + receiver.getUser_name() + "\" and is_admin = 0";        
+        x = jdbcTemplate.query(sql, new BeanPropertyRowMapper<is_member_group>(is_member_group.class));
+        
+        if(x.size() == 0) map.put("group", "receiver is not a member of this group or receiver is already admin");
+        if(map.size()>0) return map;
+
+        sql = "update is_member_group set is_admin = 1 where User_name = \"" + receiver.getUser_name() + "\" and Group_id = " + grp.getGroup_id();
+        jdbcTemplate.execute(sql);
+        return map; 
+    }
+
+    public HashMap grp_admin_remove(user sender, group_data grp, user receiver){
+        HashMap<String, String> map = new HashMap<>();
+        if(sender == null) map.put("sender", "Unauthorized access.");
+        if(grp == null) map.put("group", "Group not found.");
+        if(receiver == null) map.put("receiver", "User not found");
+        if(map.size()>0) return map;
+
+        String sql = "select * from is_member_group where Group_id = " + grp.getGroup_id() + " and User_name = \"" + sender.getUser_name() + "\" and is_admin = 1";        
+        List<is_member_group> x = jdbcTemplate.query(sql, new BeanPropertyRowMapper<is_member_group>(is_member_group.class));
+        if(x.size() == 0) map.put("group", "sender is not an admin or sender is not in that grp");
+        if(map.size()>0) return map;
+        
+        sql = "select * from is_member_group where Group_id = " + grp.getGroup_id() + " and User_name = \"" + receiver.getUser_name() + "\" and is_admin = 1";        
+        x = jdbcTemplate.query(sql, new BeanPropertyRowMapper<is_member_group>(is_member_group.class));
+        
+        if(x.size() == 0) map.put("group", "receiver is not admin or not in group");
+        if(map.size()>0) return map;
+
+        sql = "update is_member_group set is_admin = 0 where User_name = \"" + receiver.getUser_name() + "\" and Group_id = " + grp.getGroup_id();
+        jdbcTemplate.execute(sql);
+        return map; 
+    }
+
+    public HashMap groupUpdate(user sender, group_data group){
+        HashMap<String, String> map = new HashMap<>();
+        if(sender == null) map.put("sender", "Unauthorized access.");
+        if(group.getName() == null || group.getDescription() == null || group.getGroup_id()==null) map.put("group", "insufficient data");
+        if(map.size()>0) return map;
+        
+        String sql = "select * from is_member_group where Group_id = " + group.getGroup_id() + " and User_name = \"" + sender.getUser_name() + "\" and is_admin = 1";        
+        List<is_member_group> x = jdbcTemplate.query(sql, new BeanPropertyRowMapper<is_member_group>(is_member_group.class));
+        if(x.size() == 0) map.put("group", "sender is not an admin or sender is not in that grp");
+        if(map.size()>0) return map;
+
+        sql = "update group_data set name = \"" + group.getName() + "\", description = \"" + group.getDescription() + "\" where Group_id = " + group.getGroup_id();
+        jdbcTemplate.execute(sql);
         return map;
     }
 }

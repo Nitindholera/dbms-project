@@ -106,6 +106,58 @@ public class ApiController {
     }
 
     @CrossOrigin
+    @PostMapping("/grp_member_remove")
+    ResponseEntity<HashMap> grp_member_remove(@RequestHeader("token") String token, @RequestBody grp_request_form group){
+        user sender = userDAO.fetchuser_token(token);
+        group_data grp = group_dataDAO.fetchgroup(group.grp_id);
+        user receiver = userDAO.fetchuser(group.user_name);
+        HashMap map = group_dataDAO.group_member_remove(sender, grp, receiver);
+        if(map.size() == 0) return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>( map, HttpStatus.BAD_REQUEST);
+    }
+    
+    @CrossOrigin
+    @PostMapping("/grp_admin_create")
+    ResponseEntity<HashMap> grp_admin_create(@RequestHeader("token") String token, @RequestBody grp_request_form grp_request){
+        user sender = userDAO.fetchuser_token(token);
+        group_data grp = group_dataDAO.fetchgroup(grp_request.grp_id);
+        user receiver = userDAO.fetchuser(grp_request.user_name);
+        HashMap map = group_dataDAO.grp_admin_create(sender, grp, receiver);
+        if(map.size() == 0) return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>( map, HttpStatus.BAD_REQUEST);
+    }
+    
+    @CrossOrigin
+    @PostMapping("/grp_admin_remove")
+    ResponseEntity<HashMap> grp_admin_remove(@RequestHeader("token") String token, @RequestBody grp_request_form grp_request){
+        user sender = userDAO.fetchuser_token(token);
+        group_data grp = group_dataDAO.fetchgroup(grp_request.grp_id);
+        user receiver = userDAO.fetchuser(grp_request.user_name);
+        HashMap map = group_dataDAO.grp_admin_remove(sender, grp, receiver);
+        if(map.size() == 0) return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>( map, HttpStatus.BAD_REQUEST);
+    }
+    
+    @CrossOrigin
+    @PostMapping("/profileUpdate")
+    ResponseEntity<HashMap> profileUpdate(@RequestHeader("token") String token, @RequestBody user user){
+        user sender = userDAO.fetchuser_token(token);
+
+        HashMap map = userDAO.profileUpdate(sender, user);
+        if(map.size() == 0) return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>( map, HttpStatus.BAD_REQUEST);
+    }
+    
+    @CrossOrigin
+    @PostMapping("/groupUpdate")
+    ResponseEntity<HashMap> groupUpdate(@RequestHeader("token") String token, @RequestBody group_data group){
+        user sender = userDAO.fetchuser_token(token);
+
+        HashMap map = group_dataDAO.groupUpdate(sender, group);
+        if(map.size() == 0) return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>( map, HttpStatus.BAD_REQUEST);
+      }
+    @CrossOrigin
     @PostMapping("/retrieve_message")
     ResponseEntity<List<message>> retrieve_message(@RequestHeader("token") String token, @RequestBody retrieve_msg_form r_form){
         user sender = userDAO.fetchuser_token(token);
