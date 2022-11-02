@@ -198,4 +198,20 @@ public class group_dataDAO {
         jdbcTemplate.execute(sql);
         return map; 
     }
+
+    public HashMap groupUpdate(user sender, group_data group){
+        HashMap<String, String> map = new HashMap<>();
+        if(sender == null) map.put("sender", "Unauthorized access.");
+        if(group.getName() == null || group.getDescription() == null || group.getGroup_id()==null) map.put("group", "insufficient data");
+        if(map.size()>0) return map;
+        
+        String sql = "select * from is_member_group where Group_id = " + group.getGroup_id() + " and User_name = \"" + sender.getUser_name() + "\" and is_admin = 1";        
+        List<is_member_group> x = jdbcTemplate.query(sql, new BeanPropertyRowMapper<is_member_group>(is_member_group.class));
+        if(x.size() == 0) map.put("group", "sender is not an admin or sender is not in that grp");
+        if(map.size()>0) return map;
+
+        sql = "update group_data set name = \"" + group.getName() + "\", description = \"" + group.getDescription() + "\" where Group_id = " + group.getGroup_id();
+        jdbcTemplate.execute(sql);
+        return map;
+    }
 }

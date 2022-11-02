@@ -132,4 +132,13 @@ public class ApiController {
         if(map.size() == 0) return new ResponseEntity<>(HttpStatus.OK);
         return new ResponseEntity<>( map, HttpStatus.BAD_REQUEST);
     }
+
+    @PostMapping("/groupUpdate")
+    ResponseEntity<HashMap> groupUpdate(@RequestHeader("token") String token, @RequestBody group_data group){
+        user sender = userDAO.fetchuser_token(token);
+
+        HashMap map = group_dataDAO.groupUpdate(sender, group);
+        if(map.size() == 0) return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>( map, HttpStatus.BAD_REQUEST);
+    }
 }
