@@ -32,15 +32,22 @@ public class userDAO {
         return a.get(0);
     }
 
+    public user fetchuser_token(String token){
+        String sql = "SELECT * FROM user " + "where token = \"" + token + "\";";
+        List<user> a = jdbcTemplate.query(sql, new BeanPropertyRowMapper<user>(user.class));
+        if(a.size() == 0) return null;
+        return a.get(0);
+    }
+
     public HashMap Register(user user){
         HashMap<String, String> map = new HashMap<>();
-        if(user.getUser_name() == null) map.put("username", "Username can not be empty.");
-        else if (fetchuser(user.getUser_name()) != null) map.put("username", "Username already in use.");
-        if(user.getEmail_id() == null) map.put("email_id", "Email inappropriate or already in use.");
+        if(user.getUser_name() == null || user.getUser_name().length()==0) map.put("user_name", "Username can not be empty.");
+        else if (fetchuser(user.getUser_name()) != null) map.put("user_name", "Username already in use.");
+        if(user.getEmail_id() == null || user.getEmail_id().length()==0) map.put("email_id", "Email inappropriate or already in use.");
         if(user.getDate_of_birth() == null) map.put("date_of_birth", "Enter correct DOB.");
-        if (user.getPassword() == null) map.put("password", "Inappropriate password.");
-        if (user.getFname() == null) map.put("fname", "First name can not be empty.");
-        if (user.getLname() == null) map.put("lname", "Last name can not be empty.");
+        if (user.getPassword() == null || user.getPassword().length()==0) map.put("password", "Inappropriate password.");
+        if (user.getFname() == null || user.getFname().length() ==0) map.put("fname", "First name can not be empty.");
+        if (user.getLname() == null || user.getLname().length()==0) map.put("lname", "Last name can not be empty.");
         if(map.size()==0) {
         String sql = "insert into user(User_name, Fname, Lname, Email_id, Date_of_birth, password) values(\"" +
                 user.getUser_name() + "\",\"" + user.getFname()+  "\",\"" + user.getLname() + "\",\"" +  user.getEmail_id() + "\",\"" + user.getDate_of_birth() +
@@ -50,9 +57,12 @@ public class userDAO {
     }
 
     public String Get_Set_token(String user_name){
-        byte[] array = new byte[8];
-        new Random().nextBytes(array);
-        String generatedString = new String(array, Charset.forName("UTF-8"));
+        Random random = new Random();
+
+        String generatedString = random.ints(35, 91)
+                .limit(8)
+                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                .toString();
         String sql = "update user set token = \"" + generatedString + "\" where User_name = \"" + user_name + "\";";
         jdbcTemplate.execute(sql);
         return generatedString;
@@ -60,7 +70,7 @@ public class userDAO {
 
     public HashMap Login(user user){
         HashMap<String, String> map = new HashMap<>();
-        if(user.getUser_name() == null || user.getUser_name().length()==0) map.put("username", "Username can not be empty.");
+        if(user.getUser_name() == null || user.getUser_name().length()==0) map.put("user_name", "Username can not be empty.");
         if (user.getPassword() == null || user.getPassword().length()==0) map.put("password", "Inappropriate password.");
         user q = fetchuser(user.getUser_name());
         if(q == null) map.put("username", "Username incorrect.");
@@ -71,4 +81,16 @@ public class userDAO {
         return map;
     }
 
+    public HashMap profileUpdate(user sender, user user){
+        HashMap<String, String> map = new HashMap<>();
+        if(sender == null) map.put("sender", "Unauthorized access.");
+        if(user == null) map.put("user", "insufficient data");
+        if(map.size()>0) return map;
+
+        String sql = "update user set Fname = \"" + user.getFname() + "\", Lname = \"" + user.getLname() + "\", Description = \"" + user.getDescription() + "\", Date_of_birth = \""+
+        user.getDate_of_birth() + "\", Gender = \"" + user.getGender() + "\" where User_name = \""
+        + sender.getUser_name() + "\"";
+        jdbcTemplate.execute(sql);
+        return map;
+    }
 }

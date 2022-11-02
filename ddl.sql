@@ -35,7 +35,7 @@ create table group_data(
 	Group_id int not null primary key,
     name varchar(28),
     description varchar(128),
-    picture varchar(128),
+    picture varchar(128),       
     chat_id int,
     foreign key(chat_id) references chat(Chat_id)
 );
@@ -77,18 +77,22 @@ create table is_member_friend(
 
 create table friend_requests(
 	sender varchar(28),
-	reciever varchar(28),
+	receiver varchar(28),
 	Foreign key(sender) references user(User_name),
-	Foreign key(reciever) references user(User_name),
-	primary key(sender,reciever)
+	Foreign key(receiver) references user(User_name),
+	primary key(sender,receiver)
 );
 
 create table group_invites(
 	User_name varchar(28),
-	Invites int,
+	Group_id int,
 	Foreign key(User_name) references user(User_name),
-	Foreign key(Invites) references group_data(Group_id),
-	primary key(User_name,Invites)
+	Foreign key(Group_id) references group_data(Group_id),
+	primary key(User_name,Group_id)
 );
 -- insert into user values("anus", "Mohammad", "anas", "khan", "loves kali", "khan@gmail.com", "123", "v.com", "2008-7-04", "m", true, 2345);
 select * from user;
+select * from friend_requests;
+
+-- insert into friend_requests values("deva", "deva1"); 
+

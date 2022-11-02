@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/auth")
 public class AuthenticationController {
@@ -26,7 +27,7 @@ public class AuthenticationController {
     @PostMapping("/login")
     ResponseEntity<HashMap> login(@RequestBody user user){
         HashMap map = userDAO.Login(user);
-        if(map.size() == 0) return new ResponseEntity<>(HttpStatus.OK);
+        if(map.containsKey("token")) return new ResponseEntity<>(map, HttpStatus.OK);
         return new ResponseEntity<>( map, HttpStatus.BAD_REQUEST);
     }
 
