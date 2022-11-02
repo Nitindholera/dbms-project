@@ -20,4 +20,10 @@ public class messageDAO {
         String sql = "SELECT * FROM user_phone_number";
         return jdbcTemplate.query(sql,new BeanPropertyRowMapper<message>(message.class));
     }
+
+    public List<message> last_message(Int Chat_id)
+    {
+        String sql="SELECT m.message_id from message as m where m.Chat_id=Chat_id AND m.time = (select MAX(a.time) from message as a where a.Chat_id=Chat_id)"
+            return jdbcTemplate.query(sql,new BeanPropertyRowMapper<message>(message.class));
+    }
 }
