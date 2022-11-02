@@ -3,22 +3,17 @@ package com.mediabase.messanger.tables_dao;
 import java.util.HashMap;
 import java.util.List;
 
-import com.mediabase.messanger.tables.group_invites;
-import com.mediabase.messanger.tables.is_member_group;
-import com.mediabase.messanger.tables.user;
+import com.mediabase.messanger.tables.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import com.mediabase.messanger.tables.group_data;
-
 @Repository
 public class group_dataDAO {
     @Autowired
     chatDAO chatDAO;
-//    Initialize with maximum group id.
-    int g_id = 0;
+
 
 
     private JdbcTemplate jdbcTemplate;
@@ -45,7 +40,10 @@ public class group_dataDAO {
         if(group.getName() == null || group.getDescription()==null) map.put("group", "Insufficient data.");
         if(map.size()>0) return map;
         Integer Chat_id = chatDAO.New_Chat();
-        String sql = "insert into group_data(Group_id, name, chat_id, description) values("+ g_id + ", \"" + group.getName() + "\","+  Chat_id + ", \"" + group.getDescription() +"\"); ";
+        String sql = "select max(Group_id) as Group_id from group_data";
+        List<group_data> a = jdbcTemplate.query(sql,new BeanPropertyRowMapper<>(group_data.class));
+        int g_id = a.get(0).getGroup_id() + 1;
+        sql = "insert into group_data(Group_id, name, chat_id, description) values("+ g_id + ", \"" + group.getName() + "\","+  Chat_id + ", \"" + group.getDescription() +"\"); ";
         jdbcTemplate.execute(sql);
         sql = "insert into is_member_group(Group_id, User_name, is_admin) values(" + g_id + ", \"" + sender.getUser_name() + "\", 1);";
         jdbcTemplate.execute(sql);

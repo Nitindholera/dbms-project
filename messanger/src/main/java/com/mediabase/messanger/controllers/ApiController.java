@@ -1,23 +1,24 @@
 package com.mediabase.messanger.controllers;
 
-import com.mediabase.messanger.forms.fr_response_form;
-import com.mediabase.messanger.forms.grp_request_form;
-import com.mediabase.messanger.forms.grp_response_form;
+import com.mediabase.messanger.forms.*;
+import com.mediabase.messanger.tables.chat;
 import com.mediabase.messanger.tables.group_data;
+import com.mediabase.messanger.tables.message;
 import com.mediabase.messanger.tables.user;
+import com.mediabase.messanger.tables_dao.chatDAO;
 import com.mediabase.messanger.tables_dao.friendDAO;
 import com.mediabase.messanger.tables_dao.group_dataDAO;
 import com.mediabase.messanger.tables_dao.userDAO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 
 
-
+@CrossOrigin
 @RestController
 @RequestMapping("/api")
 public class ApiController {
@@ -28,8 +29,12 @@ public class ApiController {
     friendDAO friendDAO;
 
     @Autowired
+    chatDAO chatDAO;
+
+    @Autowired
     group_dataDAO group_dataDAO;
 
+    @CrossOrigin
     @PostMapping("/fr_request")
     ResponseEntity<HashMap> fr_request(@RequestHeader("token") String token, @RequestBody user user){
         user sender = userDAO.fetchuser_token(token);
@@ -39,6 +44,7 @@ public class ApiController {
         return new ResponseEntity<>( map, HttpStatus.BAD_REQUEST);
     }
 
+    @CrossOrigin
     @PostMapping("/fr_response")
     ResponseEntity<HashMap> fr_response(@RequestHeader("token") String token, @RequestBody fr_response_form fr_form){
         user receiver = userDAO.fetchuser_token(token);
@@ -50,6 +56,7 @@ public class ApiController {
         return new ResponseEntity<>( map, HttpStatus.BAD_REQUEST);
     }
 
+    @CrossOrigin
     @PostMapping("/fr_remove")
     ResponseEntity<HashMap> fr_remove(@RequestHeader("token") String token, @RequestBody user user){
         user sender = userDAO.fetchuser_token(token);
@@ -59,6 +66,7 @@ public class ApiController {
         return new ResponseEntity<>( map, HttpStatus.BAD_REQUEST);
     }
 
+    @CrossOrigin
     @PostMapping("/grp_create")
     ResponseEntity<HashMap> grp_create(@RequestHeader("token") String token, @RequestBody group_data group){
         user sender = userDAO.fetchuser_token(token);
@@ -67,6 +75,7 @@ public class ApiController {
         return new ResponseEntity<>( map, HttpStatus.BAD_REQUEST);
     }
 
+    @CrossOrigin
     @PostMapping("/grp_request")
     ResponseEntity<HashMap> grp_request(@RequestHeader("token") String token, @RequestBody grp_request_form grp_request){
         user sender = userDAO.fetchuser_token(token);
@@ -77,6 +86,7 @@ public class ApiController {
         return new ResponseEntity<>( map, HttpStatus.BAD_REQUEST);
     }
 
+    @CrossOrigin
     @PostMapping("/grp_response")
     ResponseEntity<HashMap> grp_response(@RequestHeader("token") String token, @RequestBody grp_response_form group){
         user sender = userDAO.fetchuser_token(token);
@@ -85,12 +95,34 @@ public class ApiController {
         if(map.size() == 0) return new ResponseEntity<>(HttpStatus.OK);
         return new ResponseEntity<>( map, HttpStatus.BAD_REQUEST);
     }
-    
+
+    @CrossOrigin
     @PostMapping("/grp_exit")
     ResponseEntity<HashMap> grp_exit(@RequestHeader("token") String token, @RequestBody group_data group){
         user sender = userDAO.fetchuser_token(token);
         HashMap map = group_dataDAO.grp_exit(sender, group);
         if(map.size() == 0) return new ResponseEntity<>(HttpStatus.OK);
         return new ResponseEntity<>( map, HttpStatus.BAD_REQUEST);
+    }
+
+    @CrossOrigin
+    @PostMapping("/retrieve_message")
+    ResponseEntity<List<message>> retrieve_message(@RequestHeader("token") String token, @RequestBody retrieve_msg_form r_form){
+        user sender = userDAO.fetchuser_token(token);
+        chat ch = chatDAO.fetchChat(r_form.chat_id);
+        HashMap<String, String> map = new HashMap<>();
+        if(sender == null || ch == null) {
+            map.put("error", "Inappropriate request.");
+            new ResponseEntity<>( map, HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(chatDAO.retrieve_message(ch, r_form.index), HttpStatus.OK);
+    }
+
+    @CrossOrigin
+    @GetMapping("/friends")
+    ResponseEntity<List<get_friend_form>> GetFriends(@RequestHeader("token") String token){
+        user sender = userDAO.fetchuser_token(token);
+        if(sender == null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(friendDAO.get_friends(sender), HttpStatus.OK);
     }
 }
