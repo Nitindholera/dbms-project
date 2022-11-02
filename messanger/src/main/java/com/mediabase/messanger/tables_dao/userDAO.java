@@ -81,4 +81,16 @@ public class userDAO {
         return map;
     }
 
+    public HashMap profileUpdate(user sender, user user){
+        HashMap<String, String> map = new HashMap<>();
+        if(sender == null) map.put("sender", "Unauthorized access.");
+        if(user == null) map.put("user", "insufficient data");
+        if(map.size()>0) return map;
+
+        String sql = "update user set Fname = \"" + user.getFname() + "\", Lname = \"" + user.getLname() + "\", Description = \"" + user.getDescription() + "\", Date_of_birth = \""+
+        user.getDate_of_birth() + "\", Gender = \"" + user.getGender() + "\" where User_name = \""
+        + sender.getUser_name() + "\"";
+        jdbcTemplate.execute(sql);
+        return map;
+    }
 }
