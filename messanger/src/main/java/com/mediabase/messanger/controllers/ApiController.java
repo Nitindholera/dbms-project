@@ -156,7 +156,28 @@ public class ApiController {
         HashMap map = group_dataDAO.groupUpdate(sender, group);
         if(map.size() == 0) return new ResponseEntity<>(HttpStatus.OK);
         return new ResponseEntity<>( map, HttpStatus.BAD_REQUEST);
-      }
+    }
+
+    @CrossOrigin
+    @PostMapping("/groupImageUpdate")
+    ResponseEntity<HashMap>groupImageUpdate(@RequestHeader("token") String token, @RequestBody grp_image_update_form grp_image_update){
+        user sender = userDAO.fetchuser_token(token);
+
+        HashMap map = group_dataDAO.groupImageUpdate(sender, grp_image_update);
+        if(map.size() == 0) return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>( map, HttpStatus.BAD_REQUEST);
+    }
+
+    @CrossOrigin
+    @PostMapping("/profileImageUpdate")
+    ResponseEntity<HashMap>profileImmageUpdate(@RequestHeader("token") String token, @RequestBody profile_image_update_form profile_image_update){
+        user sender = userDAO.fetchuser_token(token);
+
+        HashMap map = userDAO.profileImageUpdate(sender, profile_image_update);
+        if(map.size() == 0) return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>( map, HttpStatus.BAD_REQUEST);
+    }
+
     @CrossOrigin
     @PostMapping("/retrieve_message")
     ResponseEntity<List<message>> retrieve_message(@RequestHeader("token") String token, @RequestBody retrieve_msg_form r_form){
@@ -176,5 +197,13 @@ public class ApiController {
         user sender = userDAO.fetchuser_token(token);
         if(sender == null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         return new ResponseEntity<>(friendDAO.get_friends(sender), HttpStatus.OK);
+    }
+
+    @CrossOrigin
+    @GetMapping("/requests")
+    ResponseEntity<List<HashMap<String, String>>> requests(@RequestHeader("token") String token){
+        user sender = userDAO.fetchuser_token(token);
+        if(sender == null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(userDAO.get_requests(sender), HttpStatus.OK); 
     }
 }
