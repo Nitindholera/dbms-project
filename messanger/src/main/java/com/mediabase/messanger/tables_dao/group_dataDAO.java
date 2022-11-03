@@ -1,5 +1,7 @@
 package com.mediabase.messanger.tables_dao;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -13,6 +15,9 @@ import org.springframework.stereotype.Repository;
 public class group_dataDAO {
     @Autowired
     chatDAO chatDAO;
+
+    @Autowired
+    messageDAO messageDAO;
 
 
 
@@ -42,7 +47,8 @@ public class group_dataDAO {
         Integer Chat_id = chatDAO.New_Chat();
         String sql = "select max(Group_id) as Group_id from group_data";
         List<group_data> a = jdbcTemplate.query(sql,new BeanPropertyRowMapper<>(group_data.class));
-        int g_id = a.get(0).getGroup_id() + 1;
+        int g_id = 0;
+        if(a.get(0).getGroup_id()!=null)  g_id = a.get(0).getGroup_id() + 1;
         sql = "insert into group_data(Group_id, name, chat_id, description) values("+ g_id + ", \"" + group.getName() + "\","+  Chat_id + ", \"" + group.getDescription() +"\"); ";
         jdbcTemplate.execute(sql);
         sql = "insert into is_member_group(Group_id, User_name, is_admin) values(" + g_id + ", \"" + sender.getUser_name() + "\", 1);";
@@ -210,6 +216,29 @@ public class group_dataDAO {
 
         sql = "update group_data set name = \"" + group.getName() + "\", description = \"" + group.getDescription() + "\" where Group_id = " + group.getGroup_id();
         jdbcTemplate.execute(sql);
+        return map;
+    }
+
+    public List<HashMap<String, String>> getGroups(user sender){
+        List<HashMap<String, String>> map = new ArrayList<>();
+        String sql = "select gd.Group_id, gd.name, gd.description, gd.picture, gd.chat_id\n" +
+                "from group_data as gd, is_member_group as img\n" +
+                "where gd.Group_id = img.Group_id and img.User_name = \"" + sender.getUser_name() + "\";";
+        List<group_data> r = jdbcTemplate.query(sql,new BeanPropertyRowMapper<>(group_data.class));
+        for(group_data gd: r){
+            HashMap<String, String> p = new HashMap<>();
+            p.put("id", gd.getGroup_id().toString());
+            p.put("name", gd.getName());
+            p.put("description", gd.getDescription());
+            message m = messageDAO.last_message(gd.getChat_id());
+            LocalDateTime d = LocalDateTime.parse("2007-12-03T10:15:30");
+            if (m == null) p.put("last_act", d.toString());
+            else p.put("last_act", m.getTime().toString());
+            p.put("room", gd.getChat_id().toString());
+            p.put("unseen", "0");
+            p.put("img_url", gd.getPicture());
+            map.add(p);
+        }
         return map;
     }
 }

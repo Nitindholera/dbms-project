@@ -1,11 +1,12 @@
 package com.mediabase.messanger.tables;
 
 import java.sql.Time;
+import java.time.LocalDateTime;
 
 public class message {
     private Integer message_id;
     private Integer send_by;
-    private Time time;
+    private LocalDateTime time;
     private String data;
     private Integer Chat_id;
     public Integer getMessage_id() {
@@ -20,10 +21,10 @@ public class message {
     public void setSend_by(Integer send_by) {
         this.send_by = send_by;
     }
-    public Time getTime() {
+    public LocalDateTime getTime() {
         return time;
     }
-    public void setTime(Time time) {
+    public void setTime(LocalDateTime time) {
         this.time = time;
     }
     public String getData() {
@@ -39,7 +40,7 @@ public class message {
         Chat_id = chat_id;
     }
     public message(){}
-    public message(Integer message_id, Integer send_by, Time time, String data, Integer chat_id) {
+    public message(Integer message_id, Integer send_by, LocalDateTime time, String data, Integer chat_id) {
         this.message_id = message_id;
         this.send_by = send_by;
         this.time = time;

@@ -1,10 +1,7 @@
 package com.mediabase.messanger.controllers;
 
 import com.mediabase.messanger.forms.*;
-import com.mediabase.messanger.tables.chat;
-import com.mediabase.messanger.tables.group_data;
-import com.mediabase.messanger.tables.message;
-import com.mediabase.messanger.tables.user;
+import com.mediabase.messanger.tables.*;
 import com.mediabase.messanger.tables_dao.chatDAO;
 import com.mediabase.messanger.tables_dao.friendDAO;
 import com.mediabase.messanger.tables_dao.group_dataDAO;
@@ -12,8 +9,10 @@ import com.mediabase.messanger.tables_dao.userDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -49,8 +48,6 @@ public class ApiController {
     ResponseEntity<HashMap> fr_response(@RequestHeader("token") String token, @RequestBody fr_response_form fr_form){
         user receiver = userDAO.fetchuser_token(token);
         user sender = userDAO.fetchuser(fr_form.user_name);
-        System.out.println(fr_form.user_name);
-        System.out.println(fr_form.bool);
         HashMap map = friendDAO.fr_response(sender, receiver, fr_form.bool);
         if(map.size() == 0) return new ResponseEntity<>(HttpStatus.OK);
         return new ResponseEntity<>( map, HttpStatus.BAD_REQUEST);
@@ -142,7 +139,6 @@ public class ApiController {
     @PostMapping("/profileUpdate")
     ResponseEntity<HashMap> profileUpdate(@RequestHeader("token") String token, @RequestBody user user){
         user sender = userDAO.fetchuser_token(token);
-
         HashMap map = userDAO.profileUpdate(sender, user);
         if(map.size() == 0) return new ResponseEntity<>(HttpStatus.OK);
         return new ResponseEntity<>( map, HttpStatus.BAD_REQUEST);
@@ -176,5 +172,38 @@ public class ApiController {
         user sender = userDAO.fetchuser_token(token);
         if(sender == null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         return new ResponseEntity<>(friendDAO.get_friends(sender), HttpStatus.OK);
+    }
+
+    @CrossOrigin
+    @GetMapping("/groups")
+    ResponseEntity<List<HashMap<String, String>>> GetGroups(@RequestHeader("token") String token){
+        user sender = userDAO.fetchuser_token(token);
+        if(sender == null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(group_dataDAO.getGroups(sender), HttpStatus.OK);
+    }
+
+    @CrossOrigin
+    @GetMapping("/profile/{user_name}")
+    ResponseEntity<HashMap> Profile(@PathVariable(value = "user_name") String username){
+        user u = userDAO.fetchuser(username);
+        if(u == null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        HashMap<String, String> map = new HashMap<>();
+        map.put("username", u.getUser_name());
+        map.put("status", u.getDescription());
+        map.put("frcount", "0");
+        map.put("fname", u.getFname());
+        map.put("lname", u.getLname());
+        return new ResponseEntity<>(map, HttpStatus.OK);
+    }
+
+    @CrossOrigin
+    @GetMapping("/group/{id}")
+    ResponseEntity<HashMap<String, String>> Group(@PathVariable(value = "id") String id){
+        group_data g = group_dataDAO.fetchgroup(Integer.valueOf(id));
+        if(g == null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        HashMap<String, String> map = new HashMap<>();
+        map.put("name", g.getName());
+        map.put("description", g.getDescription());
+        return new ResponseEntity<>(map, HttpStatus.OK);
     }
 }

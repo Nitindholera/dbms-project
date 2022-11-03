@@ -1,25 +1,25 @@
 package com.mediabase.messanger.tables_dao;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
 import com.mediabase.messanger.forms.get_friend_form;
-import com.mediabase.messanger.tables.friend_requests;
-import com.mediabase.messanger.tables.group_data;
-import com.mediabase.messanger.tables.user;
+import com.mediabase.messanger.tables.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import com.mediabase.messanger.tables.friend;
-
 @Repository
 public class friendDAO {
     @Autowired
     chatDAO chatDAO;
+
+    @Autowired
+    messageDAO messageDAO;
 
 
 
@@ -41,7 +41,11 @@ public class friendDAO {
         if(map.size()>0) return map;
         if(Objects.equals(sender.getUser_name(), receiver.getUser_name())) map.put("error", "Invalid request");
         if(map.size()==0) {
-            String sql = "insert into friend_requests(sender, receiver) values(\"" + sender.getUser_name() + "\", \"" + receiver.getUser_name() + "\")";
+            String sql = "SELECT * FROM friend_requests where sender = \"" + sender.getUser_name() + "\" and receiver = \"" + receiver.getUser_name() + "\"";
+            List<friend_requests> a = jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(friend_requests.class));
+            if(a.size()>0) map.put("error", "Request already sent");
+            if(map.size()>0) return map;
+            sql = "insert into friend_requests(sender, receiver) values(\"" + sender.getUser_name() + "\", \"" + receiver.getUser_name() + "\")";
             jdbcTemplate.execute(sql);
         }
         return map;
@@ -64,7 +68,9 @@ public class friendDAO {
                 Integer Chat_id = chatDAO.New_Chat();
                 sql = "select max(Friend_id) as Friend_id from friend";
                 List<friend> r = jdbcTemplate.query(sql,new BeanPropertyRowMapper<>(friend.class));
-                int fd = r.get(0).getFriend_id() + 1;
+                int fd = 0;
+                System.out.println(r.size());
+                if(r.get(0).getFriend_id() != null) fd = r.get(0).getFriend_id() + 1;
                 sql = "insert into friend(Friend_id, Chat_id) values(" + fd + "," + Chat_id + ")";
                 jdbcTemplate.execute(sql);
 
@@ -115,21 +121,25 @@ public class friendDAO {
                 "where im.User_name = \""+ sender.getUser_name() +"\" and im.Friend_id = friend.Friend_id;";
         List<friend> a = jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(friend.class));
         List<user> c;
-        for(int i = 0; i < a.size(); i++){
+        for (friend friend : a) {
             sql = "select * from user as user1\n" +
                     "where(\n" +
                     "select user.User_name = user1.User_name\n" +
                     "from user, is_member_friend as im\n" +
-                    "where im.User_name != \"" + sender.getUser_name() + "\" and im.Friend_id = " + a.get(i).getFriend_id() + "and user.User_name = im.User_name);";
+                    "where im.User_name != \"" + sender.getUser_name() + "\" and im.Friend_id = " + friend.getFriend_id() + " and user.User_name = im.User_name);";
             List<user> b = jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(user.class));
             user e = b.get(0);
-            get_friend_form f = null;
+            get_friend_form f = new get_friend_form();
             f.username = e.getUser_name();
             f.img_url = e.getProfile_pic();
             f.first_name = e.getFname();
             f.last_name = e.getLname();
             f.status = e.getDescription();
-            f.room = a.get(i).getChat_id().toString();
+            f.room = friend.getChat_id().toString();
+            message m = messageDAO.last_message(friend.getChat_id());
+            LocalDateTime d = LocalDateTime.parse("2007-12-03T10:15:30");
+            if (m == null) f.last_act = d.toString();
+            else f.last_act = messageDAO.last_message(friend.getChat_id()).getTime().toString();
             re.add(f);
         }
         return re;
