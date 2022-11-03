@@ -34,6 +34,15 @@ public class friendDAO {
         return jdbcTemplate.query(sql,new BeanPropertyRowMapper<friend>(friend.class));
     }
 
+    public friend fetchFriend(String user1, String user2){
+        String sql = "select a.Friend_id, c.Chat_id\n" +
+                "from is_member_friend as a, is_member_friend as b, friend as c\n" +
+                "where a.User_name = \"" + user1 + "\" and b.User_name = \""+ user2 + "\" and a.Friend_id = b.Friend_id and c.Friend_id = a.Friend_id";
+        List<friend> a = jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(friend.class));
+        if (a.size()==0)return null;
+        return a.get(0);
+    }
+
     public HashMap fr_request(user sender, user receiver){
         HashMap<String, String> map = new HashMap<>();
         if(sender == null) map.put("sender", "Unauthorized access.");

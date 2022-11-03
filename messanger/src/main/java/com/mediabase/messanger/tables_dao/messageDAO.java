@@ -28,9 +28,4 @@ public class messageDAO {
         if(a.size()==0) return null;
         return a.get(0);
     }
-    public List<message> last_message(Integer Chat_id)
-    {
-        String sql="SELECT m.message_id from message as m where m.Chat_id=Chat_id AND m.time = (select MAX(a.time) from message as a where a.Chat_id=Chat_id)";
-            return jdbcTemplate.query(sql,new BeanPropertyRowMapper<message>(message.class));
-    }
 }

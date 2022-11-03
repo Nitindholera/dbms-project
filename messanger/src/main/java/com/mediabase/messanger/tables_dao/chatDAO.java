@@ -30,7 +30,7 @@ public class chatDAO {
         if(a.get(0).getChat_id()!=null)  st = a.get(0).getChat_id() + 1;
         sql = "insert into chat(Chat_id) values(" + st + ")";
         jdbcTemplate.execute(sql);
-        return st - 1;
+        return st;
     }
 
     public chat fetchChat(Integer Chat_id){

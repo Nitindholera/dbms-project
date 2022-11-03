@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 
 @CrossOrigin
@@ -158,7 +159,6 @@ public class ApiController {
     @PostMapping("/groupImageUpdate")
     ResponseEntity<HashMap>groupImageUpdate(@RequestHeader("token") String token, @RequestBody grp_image_update_form grp_image_update){
         user sender = userDAO.fetchuser_token(token);
-
         HashMap map = group_dataDAO.groupImageUpdate(sender, grp_image_update);
         if(map.size() == 0) return new ResponseEntity<>(HttpStatus.OK);
         return new ResponseEntity<>( map, HttpStatus.BAD_REQUEST);
@@ -178,12 +178,20 @@ public class ApiController {
     @PostMapping("/retrieve_message")
     ResponseEntity<List<message>> retrieve_message(@RequestHeader("token") String token, @RequestBody retrieve_msg_form r_form){
         user sender = userDAO.fetchuser_token(token);
-        chat ch = chatDAO.fetchChat(r_form.chat_id);
-        HashMap<String, String> map = new HashMap<>();
-        if(sender == null || ch == null) {
-            map.put("error", "Inappropriate request.");
-            new ResponseEntity<>( map, HttpStatus.BAD_REQUEST);
+        Integer ch_id = null;
+        String[] st = r_form.title.split("-");
+        if(Objects.equals(st[0], "fr")){
+            friend f = friendDAO.fetchFriend(st[1], st[2]);
+            ch_id = f.getChat_id();
         }
+        else {
+            group_data g = group_dataDAO.fetchgroup(Integer.valueOf(st[1]));
+            ch_id = g.getChat_id();
+        }
+        if(sender == null || ch_id == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        chat ch = chatDAO.fetchChat(ch_id);
         return new ResponseEntity<>(chatDAO.retrieve_message(ch, r_form.index), HttpStatus.OK);
     }
 
@@ -234,5 +242,20 @@ public class ApiController {
         user sender = userDAO.fetchuser_token(token);
         if(sender == null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         return new ResponseEntity<>(userDAO.get_requests(sender), HttpStatus.OK); 
+    }
+
+    @CrossOrigin
+    @GetMapping("/profileImage/{type}/{title}")
+    ResponseEntity<HashMap<String, String>> GetImage(@PathVariable(value = "type") Integer type,@PathVariable(value = "title") String title){
+        HashMap<String, String> map = new HashMap<>();
+        if(type==0){
+            user u = userDAO.fetchuser(title);
+            if(u != null) map.put("img_url", u.getProfile_pic());
+        }
+        else if (type == 1) {
+            group_data g = group_dataDAO.fetchgroup(Integer.valueOf(title));
+            if(g != null) map.put("img_url", g.getPicture());
+        }
+        return new ResponseEntity<>(map, HttpStatus.OK);
     }
 }
