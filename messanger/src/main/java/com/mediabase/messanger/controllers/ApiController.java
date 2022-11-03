@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 
 @CrossOrigin
@@ -256,6 +258,15 @@ public class ApiController {
             group_data g = group_dataDAO.fetchgroup(Integer.valueOf(title));
             if(g != null) map.put("img_url", g.getPicture());
         }
+        return new ResponseEntity<>(map, HttpStatus.OK);
+    }
+
+    @CrossOrigin
+    @PostMapping("/groupMemberList")
+    ResponseEntity<HashMap<String, List<HashMap<String, String>>>>groupMemberList(@RequestHeader("token") String token, @RequestBody group_data group){
+        user sender = userDAO.fetchuser_token(token);
+        HashMap<String, List<HashMap<String, String>>> map = group_dataDAO.get_group_members(sender, group);
+        if(sender == null || map == null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         return new ResponseEntity<>(map, HttpStatus.OK);
     }
 }
