@@ -11,7 +11,7 @@ create table user(
     Description varchar(128),
     Email_id varchar(128),
     Password varchar(128),
-    Profile_pic varchar(128),
+    Profile_pic varchar(512),
     Date_of_birth date,
     Gender char,
     is_verified bool,
