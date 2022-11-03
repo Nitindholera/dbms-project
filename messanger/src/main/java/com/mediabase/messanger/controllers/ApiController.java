@@ -198,4 +198,12 @@ public class ApiController {
         if(sender == null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         return new ResponseEntity<>(friendDAO.get_friends(sender), HttpStatus.OK);
     }
+
+    @CrossOrigin
+    @GetMapping("/requests")
+    ResponseEntity<List<HashMap<String, String>>> requests(@RequestHeader("token") String token){
+        user sender = userDAO.fetchuser_token(token);
+        if(sender == null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(userDAO.get_requests(sender), HttpStatus.OK); 
+    }
 }

@@ -1,6 +1,7 @@
 package com.mediabase.messanger.tables_dao;
 
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -11,6 +12,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import com.mediabase.messanger.forms.profile_image_update_form;
+import com.mediabase.messanger.tables.group_data;
 import com.mediabase.messanger.tables.user;
 
 @Repository
@@ -104,5 +106,34 @@ public class userDAO {
         String sql = "update user set Profile_pic = \"" + profile_image_update.img_url + "\" where User_name = \"" + sender.getUser_name() + "\"";
         jdbcTemplate.execute(sql);
         return map;
+    }
+
+    public List<HashMap<String, String>> get_requests(user sender){
+        List<HashMap<String, String>> list_map = new ArrayList<>();
+        String sql = "select u.User_name, u.Fname, u.Lname from user as u , friend_requests as f where f.receiver = \"" + sender.getUser_name() + "\" and f.sender = u.User_name";
+        List<user> a = jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(user.class));
+
+        for(int i = 0;i<a.size();i++){
+            HashMap<String, String> map = new HashMap<>();
+            map.put("username",a.get(i).getUser_name());
+            map.put("firstname",a.get(i).getFname());
+            map.put("lastname",a.get(i).getLname());
+            map.put("type","0");
+            list_map.add(map);
+        }
+
+        sql = "select g.Group_id, g.name, g.description from group_data as g, group_invites as gi where gi.User_name = \"" + sender.getUser_name() + "\" and g.Group_id = gi.Group_id";
+        List<group_data> b = jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(group_data.class));
+
+        for(int i = 0;i<b.size();i++){
+            HashMap<String, String> map = new HashMap<>();
+            map.put("id", Integer.toString(b.get(i).getGroup_id()));
+            map.put("name",b.get(i).getName());
+            map.put("description",b.get(i).getDescription());
+            map.put("type","1");
+            list_map.add(map);
+        }
+
+        return list_map;
     }
 }
