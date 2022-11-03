@@ -115,8 +115,8 @@ public class userDAO {
         for(int i = 0;i<a.size();i++){
             HashMap<String, String> map = new HashMap<>();
             map.put("username",a.get(i).getUser_name());
-            map.put("firstname",a.get(i).getFname());
-            map.put("lastname",a.get(i).getLname());
+            map.put("first_name",a.get(i).getFname());
+            map.put("last_name",a.get(i).getLname());
             map.put("type","0");
             list_map.add(map);
         }
@@ -132,7 +132,6 @@ public class userDAO {
             map.put("type","1");
             list_map.add(map);
         }
-
         return list_map;
     }
 }
