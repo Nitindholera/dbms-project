@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import com.mediabase.messanger.forms.grp_image_update_form;
 import com.mediabase.messanger.tables.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -239,6 +240,21 @@ public class group_dataDAO {
             p.put("img_url", gd.getPicture());
             map.add(p);
         }
+        return map;
+    }
+    public HashMap groupImageUpdate(user sender, grp_image_update_form grp_image_update){
+        HashMap<String, String> map = new HashMap<>();
+        if(sender == null) map.put("sender", "Unauthorized access.");
+        if(grp_image_update.grp_id == null || grp_image_update.img_url == null) map.put("group", "insufficient data");
+        if(map.size()>0) return map;
+
+        String sql = "select * from is_member_group where Group_id = " + grp_image_update.grp_id + " and User_name = \"" + sender.getUser_name() + "\" and is_admin = 1";        
+        List<is_member_group> x = jdbcTemplate.query(sql, new BeanPropertyRowMapper<is_member_group>(is_member_group.class));
+        if(x.size() == 0) map.put("group", "sender is not an admin or sender is not in that grp");
+        if(map.size()>0) return map;
+
+        sql = "update group_data set picture = \"" + grp_image_update.img_url + "\" where Group_id = " + grp_image_update.grp_id;
+        jdbcTemplate.execute(sql);
         return map;
     }
 }
