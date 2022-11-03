@@ -1,5 +1,6 @@
 package com.mediabase.messanger.tables_dao;
 
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,8 +19,10 @@ public class group_dataDAO {
     chatDAO chatDAO;
 
     @Autowired
+    userDAO userDAO;
+    
+    @Autowired
     messageDAO messageDAO;
-
 
 
     private JdbcTemplate jdbcTemplate;
@@ -255,6 +258,62 @@ public class group_dataDAO {
 
         sql = "update group_data set picture = \"" + grp_image_update.img_url + "\" where Group_id = " + grp_image_update.grp_id;
         jdbcTemplate.execute(sql);
+        return map;
+    }
+
+    public HashMap<String, List<HashMap<String, String>>> get_group_members(user sender, group_data group){
+        HashMap<String, List<HashMap<String, String>>> map = new HashMap<>();
+        
+        String sql = "select * from is_member_group where Group_id = " + group.getGroup_id() + " and User_name = \"" + sender.getUser_name() + "\"";        
+        List<is_member_group> x = jdbcTemplate.query(sql, new BeanPropertyRowMapper<is_member_group>(is_member_group.class));
+        if(x.size()==0) return null;
+
+        sql = "select * from is_member_group where Group_id = " + group.getGroup_id() + " and is_admin = 0 and User_name != \"" + sender.getUser_name() + "\"";
+        List<is_member_group> y = jdbcTemplate.query(sql, new BeanPropertyRowMapper<is_member_group>(is_member_group.class));
+        
+        List<HashMap<String, String>> arr1 = new ArrayList<>();
+        for(int i = 0;i<y.size(); i++){
+            HashMap<String, String> mp = new HashMap<>();
+            user u = userDAO.fetchuser(y.get(i).getUser_name());
+            mp.put("username", u.getUser_name());
+            mp.put("first_name", u.getFname());
+            mp.put("last_name", u.getLname());
+            mp.put("isAdmin", "0");
+            arr1.add(mp);
+        }
+        map.put("members", arr1);
+
+        sql = "select * from is_member_group where Group_id = " + group.getGroup_id() + " and is_admin = 1 and User_name != \"" + sender.getUser_name() + "\"";
+        List<is_member_group> z = jdbcTemplate.query(sql, new BeanPropertyRowMapper<is_member_group>(is_member_group.class));
+
+        List<HashMap<String, String>> arr2 = new ArrayList<>();
+        for(int i = 0;i<z.size(); i++){
+            HashMap<String, String> mp = new HashMap<>();
+            user u = userDAO.fetchuser(z.get(i).getUser_name());
+            mp.put("username", u.getUser_name());
+            mp.put("first_name", u.getFname());
+            mp.put("last_name", u.getLname());
+            mp.put("isAdmin", "1");
+            arr2.add(mp);
+        }
+        map.put("admins", arr2);
+
+        List<HashMap<String, String>> arr3 = new ArrayList<>();
+
+        sql = "select * from is_member_group where Group_id = " + group.getGroup_id() + " and User_name = \"" + sender.getUser_name() + "\"";
+        List<is_member_group> z1 = jdbcTemplate.query(sql, new BeanPropertyRowMapper<is_member_group>(is_member_group.class));
+        HashMap<String, String> mp = new HashMap<>();
+        user u = userDAO.fetchuser(z1.get(0).getUser_name());
+        mp.put("usernmae", u.getUser_name());
+        mp.put("first_name", u.getFname());
+        mp.put("last_name", u.getLname());
+        if(z1.get(0).getIs_admin())
+            mp.put("isAdmin","1");
+        else
+            mp.put("isAdmin","0");
+
+        arr3.add(mp);
+        map.put("user", arr3);
         return map;
     }
 }
