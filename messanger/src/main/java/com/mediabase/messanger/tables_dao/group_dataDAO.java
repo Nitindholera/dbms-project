@@ -309,7 +309,7 @@ public class group_dataDAO {
         List<is_member_group> z1 = jdbcTemplate.query(sql, new BeanPropertyRowMapper<is_member_group>(is_member_group.class));
         HashMap<String, String> mp = new HashMap<>();
         user u = userDAO.fetchuser(z1.get(0).getUser_name());
-        mp.put("usernmae", u.getUser_name());
+        mp.put("username", u.getUser_name());
         mp.put("first_name", u.getFname());
         mp.put("last_name", u.getLname());
         if(z1.get(0).getIs_admin())

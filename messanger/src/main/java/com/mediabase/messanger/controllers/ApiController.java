@@ -267,8 +267,9 @@ public class ApiController {
     @PostMapping("/groupMemberList")
     ResponseEntity<HashMap<String, List<HashMap<String, String>>>>groupMemberList(@RequestHeader("token") String token, @RequestBody group_data group){
         user sender = userDAO.fetchuser_token(token);
+        if(sender==null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         HashMap<String, List<HashMap<String, String>>> map = group_dataDAO.get_group_members(sender, group);
-        if(sender == null || map == null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        if(map == null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         return new ResponseEntity<>(map, HttpStatus.OK);
     }
 }
