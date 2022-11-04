@@ -252,11 +252,13 @@ public class ApiController {
         HashMap<String, String> map = new HashMap<>();
         if(type==0){
             user u = userDAO.fetchuser(title);
-            if(u != null) map.put("img_url", u.getProfile_pic());
+            if(u.getProfile_pic() != null) map.put("img_url", u.getProfile_pic());
+            else map.put("img_url", "https://eitrawmaterials.eu/wp-content/uploads/2016/09/person-icon.png");
         }
         else if (type == 1) {
             group_data g = group_dataDAO.fetchgroup(Integer.valueOf(title));
-            if(g != null) map.put("img_url", g.getPicture());
+            if(g.getPicture() != null) map.put("img_url", g.getPicture());
+            else map.put("img_url", "https://www.iconpacks.net/icons/1/free-user-group-icon-296-thumb.png");
         }
         return new ResponseEntity<>(map, HttpStatus.OK);
     }

@@ -144,7 +144,7 @@ public class friendDAO {
             f.first_name = e.getFname();
             f.last_name = e.getLname();
             f.status = e.getDescription();
-            f.room = friend.getChat_id().toString();
+            f.room = "fr_" + sender.getUser_name() + "_" + e.getUser_name();
             message m = messageDAO.last_message(friend.getChat_id());
             LocalDateTime d = LocalDateTime.parse("2007-12-03T10:15:30");
             if (m == null) f.last_act = d.toString();
