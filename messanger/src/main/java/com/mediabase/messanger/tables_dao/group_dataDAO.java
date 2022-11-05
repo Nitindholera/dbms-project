@@ -2,10 +2,9 @@ package com.mediabase.messanger.tables_dao;
 
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
+import com.mediabase.messanger.forms.get_friend_form;
 import com.mediabase.messanger.forms.grp_image_update_form;
 import com.mediabase.messanger.tables.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -248,6 +247,8 @@ public class group_dataDAO {
             else p.put("img_url", gd.getPicture());
             map.add(p);
         }
+        map.sort(Comparator.comparing((HashMap a) -> LocalDateTime.parse((CharSequence) a.get("last_act"))));
+        Collections.reverse(map);
         return map;
     }
     public HashMap groupImageUpdate(user sender, grp_image_update_form grp_image_update){
