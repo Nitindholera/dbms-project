@@ -1,10 +1,7 @@
 package com.mediabase.messanger.tables_dao;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import com.mediabase.messanger.forms.get_friend_form;
 import com.mediabase.messanger.tables.*;
@@ -145,10 +142,12 @@ public class friendDAO {
             f.room = "fr_" + sender.getUser_name() + "_" + e.getUser_name();
             message m = messageDAO.last_message(friend.getChat_id());
             LocalDateTime d = LocalDateTime.parse("2007-12-03T10:15:30");
-            if (m == null) f.last_act = d.toString();
-            else f.last_act = messageDAO.last_message(friend.getChat_id()).getTime().toString();
+            if (m == null) f.last_act = d;
+            else f.last_act = m.getTime();
             re.add(f);
         }
+        re.sort(Comparator.comparing((get_friend_form a2) -> a2.last_act));
+        Collections.reverse(re);
         return re;
     }
 }
