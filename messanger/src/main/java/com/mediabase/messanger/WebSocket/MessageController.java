@@ -14,6 +14,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 
@@ -40,6 +41,7 @@ public class MessageController {
 
     @MessageMapping("/hello/{username}")
     public Message_class greeting(Message_class message, @DestinationVariable String username) throws Exception {
+        message.setTime(LocalDateTime.now());
         Thread.sleep(100);
         String[] st = message.getRoom().split("-");
         if(Objects.equals(st[0], "fr")){

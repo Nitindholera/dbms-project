@@ -61,6 +61,7 @@ create table message(
 
 
 
+
 create table friend(
 	Friend_id int not null primary key,
     Chat_id int,
@@ -101,3 +102,5 @@ select * from is_member_group;
 select * from group_data;
 select * from group_invites;
 select * from friend_requests;
+select * from message;
+SELECT * FROM message where Chat_id = 4;

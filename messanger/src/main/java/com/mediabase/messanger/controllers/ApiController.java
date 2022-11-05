@@ -1,5 +1,6 @@
 package com.mediabase.messanger.controllers;
 
+import com.mediabase.messanger.WebSocket.Message_class;
 import com.mediabase.messanger.forms.*;
 import com.mediabase.messanger.tables.*;
 import com.mediabase.messanger.tables_dao.chatDAO;
@@ -178,7 +179,7 @@ public class ApiController {
 
     @CrossOrigin
     @PostMapping("/retrieve_message")
-    ResponseEntity<List<message>> retrieve_message(@RequestHeader("token") String token, @RequestBody retrieve_msg_form r_form){
+    ResponseEntity<List<Message_class>> retrieve_message(@RequestHeader("token") String token, @RequestBody retrieve_msg_form r_form){
         user sender = userDAO.fetchuser_token(token);
         Integer ch_id = null;
         String[] st = r_form.title.split("-");
@@ -194,7 +195,12 @@ public class ApiController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         chat ch = chatDAO.fetchChat(ch_id);
-        return new ResponseEntity<>(chatDAO.retrieve_message(ch, r_form.index), HttpStatus.OK);
+        List<Message_class> re = new ArrayList<>();
+        List<message> a = chatDAO.retrieve_message(ch, r_form.index);
+        for(message b : a){
+            re.add(new Message_class(b.getSend_by(), b.getTime(), b.getData(), r_form.title));
+        }
+        return new ResponseEntity<>(re, HttpStatus.OK);
     }
 
     @CrossOrigin
