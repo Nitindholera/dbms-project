@@ -35,7 +35,7 @@ create table group_data(
 	Group_id int not null primary key,
     name varchar(28),
     description varchar(128),
-    picture varchar(128),       
+    picture varchar(512),       
     chat_id int,
     foreign key(chat_id) references chat(Chat_id)
 );

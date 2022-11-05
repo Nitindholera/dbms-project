@@ -25,7 +25,7 @@ public class group_dataDAO {
     messageDAO messageDAO;
 
 
-    private JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
 
     public group_dataDAO(JdbcTemplate jdbcTemplate){
         this.jdbcTemplate = jdbcTemplate;
@@ -72,12 +72,16 @@ public class group_dataDAO {
         if(x.size() != 0) map.put("sender", "Sender not admin");
         if(map.size()>0) return map;
 
-        sql = "select * from is_member_group where Group_id = " + group.getGroup_id() + " and User_name = \"" + receiver.getUser_name() + " \"";
+        sql = "select * from is_member_group where Group_id = " + group.getGroup_id() + " and User_name = \"" + receiver.getUser_name() + "\"";
         x = jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(is_member_group.class));
         if(x.size() != 0) map.put("receiver", "Already a group member");
         if(map.size()==0){
-            sql = "insert into group_invites(User_name, Group_id) values(\"" + receiver.getUser_name() + "\"," + group.getGroup_id() + ")";
-            jdbcTemplate.execute(sql);
+            sql = "select * from group_invites where Group_id = " + group.getGroup_id() + " and User_name = \"" + receiver.getUser_name() + "\"";
+            List<group_invites> y = jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(group_invites.class));
+            if (y.size()==0) {
+                sql = "insert into group_invites(User_name, Group_id) values(\"" + receiver.getUser_name() + "\"," + group.getGroup_id() + ")";
+                jdbcTemplate.execute(sql);
+            }
         }
         return map;
     }
@@ -151,7 +155,7 @@ public class group_dataDAO {
         if(map.size()>0) return map;
         
         sql = "select * from is_member_group where Group_id = " + grp.getGroup_id() + " and User_name = \"" + receiver.getUser_name() + "\"";        
-        x = jdbcTemplate.query(sql, new BeanPropertyRowMapper<is_member_group>(is_member_group.class));
+        x = jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(is_member_group.class));
         
         if(x.size() == 0) map.put("group", "receiver is not a member of this group");
         if(map.size()>0) return map;
@@ -238,9 +242,10 @@ public class group_dataDAO {
             LocalDateTime d = LocalDateTime.parse("2007-12-03T10:15:30");
             if (m == null) p.put("last_act", d.toString());
             else p.put("last_act", m.getTime().toString());
-            p.put("room", gd.getChat_id().toString());
+            p.put("room", "grp_" + gd.getChat_id().toString());
             p.put("unseen", "0");
-            p.put("img_url", gd.getPicture());
+            if(gd.getPicture()==null) p.put("img_url", "https://www.iconpacks.net/icons/1/free-user-group-icon-296-thumb.png");
+            else p.put("img_url", gd.getPicture());
             map.add(p);
         }
         return map;
@@ -304,7 +309,7 @@ public class group_dataDAO {
         List<is_member_group> z1 = jdbcTemplate.query(sql, new BeanPropertyRowMapper<is_member_group>(is_member_group.class));
         HashMap<String, String> mp = new HashMap<>();
         user u = userDAO.fetchuser(z1.get(0).getUser_name());
-        mp.put("usernmae", u.getUser_name());
+        mp.put("username", u.getUser_name());
         mp.put("first_name", u.getFname());
         mp.put("last_name", u.getLname());
         if(z1.get(0).getIs_admin())
@@ -315,5 +320,11 @@ public class group_dataDAO {
         arr3.add(mp);
         map.put("user", arr3);
         return map;
+    }
+
+    public List<is_member_group> getMembers(Integer g_id){
+        group_data g = fetchgroup(g_id);
+        String sql = "select * from is_member_group where Group_id = " + g.getGroup_id();
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<is_member_group>(is_member_group.class));
     }
 }
