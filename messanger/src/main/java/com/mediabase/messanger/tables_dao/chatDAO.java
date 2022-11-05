@@ -43,7 +43,9 @@ public class chatDAO {
 
     public List<message> retrieve_message(chat ch, Integer index) {
         String sql = "SELECT * FROM message where Chat_id = " + ch.getChat_id();
-        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(message.class));
+        System.out.println(sql);
+        List<message> m = jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(message.class));
+        return m;
     }
 
 //    public

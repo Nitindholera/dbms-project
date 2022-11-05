@@ -25,7 +25,7 @@ public class group_dataDAO {
     messageDAO messageDAO;
 
 
-    private JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
 
     public group_dataDAO(JdbcTemplate jdbcTemplate){
         this.jdbcTemplate = jdbcTemplate;
@@ -320,5 +320,11 @@ public class group_dataDAO {
         arr3.add(mp);
         map.put("user", arr3);
         return map;
+    }
+
+    public List<is_member_group> getMembers(Integer g_id){
+        group_data g = fetchgroup(g_id);
+        String sql = "select * from is_member_group where Group_id = " + g.getGroup_id();
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<is_member_group>(is_member_group.class));
     }
 }

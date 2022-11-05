@@ -3,28 +3,13 @@ package com.mediabase.messanger.WebSocket;
 import java.time.LocalDateTime;
 
 public class Message_class {
-    private Integer send_by;
-    private LocalDateTime time;
-    private String data;
-    private Integer Chat_id;
 
-    public Message_class(Integer send_by, LocalDateTime time, String data, Integer chat_id) {
-        this.send_by = send_by;
-        this.time = time;
-        this.data = data;
-        Chat_id = chat_id;
+    public String getSender() {
+        return sender;
     }
 
-    public Message_class(){
-
-    }
-
-    public Integer getSend_by() {
-        return send_by;
-    }
-
-    public void setSend_by(Integer send_by) {
-        this.send_by = send_by;
+    public void setSender(String sender) {
+        this.sender = sender;
     }
 
     public LocalDateTime getTime() {
@@ -43,11 +28,31 @@ public class Message_class {
         this.data = data;
     }
 
-    public Integer getChat_id() {
-        return Chat_id;
+    public String getRoom() {
+        return room;
     }
 
-    public void setChat_id(Integer chat_id) {
-        Chat_id = chat_id;
+    public void setRoom(String room) {
+        this.room = room;
     }
+
+    public Message_class(String data) {
+        this.data = data;
+    }
+
+    public Message_class() {
+    }
+
+    public Message_class(String sender, LocalDateTime time, String data, String room) {
+        this.sender = sender;
+        this.time = time;
+        this.data = data;
+        this.room = room;
+    }
+
+    private String sender;
+    private LocalDateTime time;
+    private String data;
+    private String room;
+
 }
