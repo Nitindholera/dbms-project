@@ -78,7 +78,6 @@ public class friendDAO {
                 sql = "select max(Friend_id) as Friend_id from friend";
                 List<friend> r = jdbcTemplate.query(sql,new BeanPropertyRowMapper<>(friend.class));
                 int fd = 0;
-                System.out.println(r.size());
                 if(r.get(0).getFriend_id() != null) fd = r.get(0).getFriend_id() + 1;
                 sql = "insert into friend(Friend_id, Chat_id) values(" + fd + "," + Chat_id + ")";
                 jdbcTemplate.execute(sql);
@@ -87,7 +86,6 @@ public class friendDAO {
                 jdbcTemplate.execute(sql);
                 sql = "insert into is_member_friend(Friend_id, User_name) values(" + fd + ", \"" + receiver.getUser_name() + "\")";
                 jdbcTemplate.execute(sql);
-                fd++;
             }
         }
         return map;
@@ -144,7 +142,7 @@ public class friendDAO {
             f.first_name = e.getFname();
             f.last_name = e.getLname();
             f.status = e.getDescription();
-            f.room = friend.getChat_id().toString();
+            f.room = "fr_" + sender.getUser_name() + "_" + e.getUser_name();
             message m = messageDAO.last_message(friend.getChat_id());
             LocalDateTime d = LocalDateTime.parse("2007-12-03T10:15:30");
             if (m == null) f.last_act = d.toString();
