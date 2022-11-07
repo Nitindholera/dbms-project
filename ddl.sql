@@ -11,7 +11,7 @@ create table user(
     Description varchar(128),
     Email_id varchar(128),
     Password varchar(128),
-    Profile_pic varchar(128),
+    Profile_pic varchar(512),
     Date_of_birth date,
     Gender char,
     is_verified bool,
@@ -35,7 +35,7 @@ create table group_data(
 	Group_id int not null primary key,
     name varchar(28),
     description varchar(128),
-    picture varchar(128),       
+    picture varchar(512),       
     chat_id int,
     foreign key(chat_id) references chat(Chat_id)
 );
@@ -53,11 +53,12 @@ create table message(
 	message_id int not null primary key,
     send_by varchar(28),
     foreign key (send_by) references user(User_name),
-    time TIME,
+    time datetime,
     data varchar(256),
     Chat_id int,
     foreign key(Chat_id) references chat(Chat_id)
 );
+
 
 
 
@@ -93,6 +94,13 @@ create table group_invites(
 -- insert into user values("anus", "Mohammad", "anas", "khan", "loves kali", "khan@gmail.com", "123", "v.com", "2008-7-04", "m", true, 2345);
 select * from user;
 select * from friend_requests;
-
+select * from friend;
 -- insert into friend_requests values("deva", "deva1"); 
-
+select * from group_data;
+select max(Friend_id) as Friend_id from friend;
+select * from is_member_group;
+select * from group_data;
+select * from group_invites;
+select * from friend_requests;
+select * from message;
+SELECT * FROM message where Chat_id = 4;

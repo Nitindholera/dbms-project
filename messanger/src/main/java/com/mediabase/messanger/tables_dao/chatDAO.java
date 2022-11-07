@@ -26,10 +26,11 @@ public class chatDAO {
     public Integer New_Chat(){
         String sql = "select max(chat_id) as Chat_id from chat";
         List<chat> a = jdbcTemplate.query(sql,new BeanPropertyRowMapper<chat>(chat.class));
-        int st = a.get(0).getChat_id() + 1;
+        int st = 0;
+        if(a.get(0).getChat_id()!=null)  st = a.get(0).getChat_id() + 1;
         sql = "insert into chat(Chat_id) values(" + st + ")";
         jdbcTemplate.execute(sql);
-        return st - 1;
+        return st;
     }
 
     public chat fetchChat(Integer Chat_id){
@@ -41,9 +42,8 @@ public class chatDAO {
 
 
     public List<message> retrieve_message(chat ch, Integer index) {
-        String sql = "SELECT * FROM message where Chat_id = " + ch.getChat_id();
+        String sql = "select * from message where Chat_id = " + ch.getChat_id();
         return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(message.class));
     }
 
-//    public
 }
